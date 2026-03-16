@@ -140,6 +140,22 @@ def create_notion_entry(
             "rich_text": [{"text": {"content": entry.substances}}]
         }
     
+    # Add weather as JSON string to Weather field
+    if weather_data and weather_data.get("success"):
+        import json
+        weather_json = json.dumps({
+            "location": weather_data.get("location"),
+            "date": weather_data.get("date"),
+            "temp_max": weather_data.get("temperature_max"),
+            "temp_min": weather_data.get("temperature_min"),
+            "precipitation": weather_data.get("precipitation"),
+            "weather": weather_data.get("weather"),
+            "wind_speed": weather_data.get("wind_speed")
+        })
+        properties["Weather"] = {
+            "rich_text": [{"text": {"content": weather_json}}]
+        }
+    
     # Build the page content with weather
     children = []
     
@@ -212,5 +228,8 @@ def create_notion_entry(
         payload["children"] = children
     
     response = requests.post(url, headers=headers, json=payload)
+    if not response.ok:
+        print(f"❌ Notion API Error: {response.status_code}")
+        print(f"Response: {response.text}")
     response.raise_for_status()
     return response.json()
