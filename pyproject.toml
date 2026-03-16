@@ -1,0 +1,19 @@
+[project]
+name = "assistant"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "discord-py>=2.7.1",
+    "dotenv>=0.9.9",
+    "notion-client>=3.0.0",
+    "openai>=2.21.0",
+    "pydantic>=2.12.5",
+    "requests>=2.32.5",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
