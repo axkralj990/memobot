@@ -214,11 +214,34 @@ TIMEZONE=Asia/Tokyo
 
 Valid timezones: [IANA timezone database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
 
-### Calendar Selection
+### Multiple Calendars
 
-Default: Primary calendar
+**To query multiple calendars** (e.g., personal + work):
 
-To use a different calendar, modify `calendar_id` in `src/tools/calendar_tools.py`
+1. **Share other calendars** with your primary Google account:
+   - On secondary account: Calendar Settings → Share with specific people
+   - Add your primary email with "Make changes" permission
+
+2. **Get calendar IDs**:
+   - In Google Calendar, click calendar → Settings
+   - Scroll to "Integrate calendar"
+   - Copy "Calendar ID" (e.g., `xyz@group.calendar.google.com`)
+
+3. **Add to `.env`** (comma-separated, no spaces):
+```bash
+# Query primary calendar only (default)
+CALENDAR_IDS=primary
+
+# Query multiple calendars
+CALENDAR_IDS=primary,work@group.calendar.google.com,family@gmail.com
+```
+
+4. **Restart bot** - it will now query all configured calendars!
+
+**Notes:**
+- List/query operations check ALL configured calendars
+- Create operations default to primary calendar
+- Each calendar must be accessible with your OAuth credentials
 
 ## Troubleshooting
 

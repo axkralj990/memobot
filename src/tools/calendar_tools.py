@@ -19,6 +19,13 @@ CREDENTIALS_FILE = "credentials.json"
 TOKEN_FILE = "token.pickle"
 
 
+def get_calendar_ids():
+    """Get list of calendar IDs from environment variable."""
+    calendar_ids = os.getenv("CALENDAR_IDS", "primary")
+    # Split by comma and strip whitespace
+    return [cal_id.strip() for cal_id in calendar_ids.split(",") if cal_id.strip()]
+
+
 def get_credentials():
     """Get or refresh Google Calendar API credentials."""
     creds = None
@@ -132,10 +139,10 @@ def list_calendar_events(
         start_date: Start date in ISO format (e.g., "2026-03-19")
         end_date: Optional end date in ISO format (defaults to start_date + 1 day)
         max_results: Maximum number of events to return
-        calendar_id: Calendar ID (default: "primary")
+        calendar_id: Calendar ID (default: uses CALENDAR_IDS from env)
     
     Returns:
-        dict with list of events
+        dict with list of events from all configured calendars
     """
     try:
         service = get_calendar_service()
@@ -153,18 +160,50 @@ def list_calendar_events(
         time_min = start_dt.isoformat() + 'Z'
         time_max = end_dt.isoformat() + 'Z'
         
-        events_result = service.events().list(
-            calendarId=calendar_id,
-            timeMin=time_min,
-            timeMax=time_max,
-            maxResults=max_results,
-            singleEvents=True,
-            orderBy='startTime'
-        ).execute()
+        # Get calendar IDs from env or use provided calendar_id
+        if calendar_id == "primary":
+            # Use configured calendars from environment
+            calendar_ids = get_calendar_ids()
+        else:
+            # Use specific calendar provided
+            calendar_ids = [calendar_id]
         
-        events = events_result.get('items', [])
+        # Query all calendars and combine results
+        all_events = []
+        for cal_id in calendar_ids:
+            try:
+                events_result = service.events().list(
+                    calendarId=cal_id,
+                    timeMin=time_min,
+                    timeMax=time_max,
+                    maxResults=max_results,
+                    singleEvents=True,
+                    orderBy='startTime'
+                ).execute()
+                
+                events = events_result.get('items', [])
+                
+                for event in events:
+                    start = event['start'].get('dateTime', event['start'].get('date'))
+                    all_events.append({
+                        "id": event['id'],
+                        "summary": event.get('summary', 'No title'),
+                        "start": start,
+                        "end": event['end'].get('dateTime', event['end'].get('date')),
+                        "location": event.get('location'),
+                        "description": event.get('description'),
+                        "link": event.get('htmlLink'),
+                        "calendar_id": cal_id
+                    })
+            except HttpError as error:
+                # Skip calendars that error (might not have access)
+                print(f"Warning: Could not access calendar {cal_id}: {error}")
+                continue
         
-        if not events:
+        # Sort combined events by start time
+        all_events.sort(key=lambda x: x['start'])
+        
+        if not all_events:
             return {
                 "success": True,
                 "events": [],
@@ -172,24 +211,11 @@ def list_calendar_events(
                 "message": f"📅 No events found between {start_date} and {end_dt.date()}"
             }
         
-        event_list = []
-        for event in events:
-            start = event['start'].get('dateTime', event['start'].get('date'))
-            event_list.append({
-                "id": event['id'],
-                "summary": event.get('summary', 'No title'),
-                "start": start,
-                "end": event['end'].get('dateTime', event['end'].get('date')),
-                "location": event.get('location'),
-                "description": event.get('description'),
-                "link": event.get('htmlLink')
-            })
-        
         return {
             "success": True,
-            "events": event_list,
-            "count": len(event_list),
-            "message": f"📅 Found {len(event_list)} event(s)"
+            "events": all_events,
+            "count": len(all_events),
+            "message": f"📅 Found {len(all_events)} event(s) across {len(calendar_ids)} calendar(s)"
         }
     
     except HttpError as error:
@@ -237,14 +263,14 @@ def find_free_slots(
     calendar_id: str = "primary"
 ):
     """
-    Find free time slots on a given date.
+    Find free time slots on a given date across all configured calendars.
     
     Args:
         date: Date in ISO format (e.g., "2026-03-19")
         duration_minutes: Desired slot duration in minutes
         working_hours_start: Start of working hours (default: 9)
         working_hours_end: End of working hours (default: 18)
-        calendar_id: Calendar ID (default: "primary")
+        calendar_id: Calendar ID (default: uses CALENDAR_IDS from env)
     
     Returns:
         dict with list of free slots
@@ -257,21 +283,36 @@ def find_free_slots(
         day_start = target_date.replace(hour=working_hours_start, minute=0, second=0)
         day_end = target_date.replace(hour=working_hours_end, minute=0, second=0)
         
-        # Get busy times
+        # Get calendar IDs from env or use provided calendar_id
+        if calendar_id == "primary":
+            calendar_ids = get_calendar_ids()
+        else:
+            calendar_ids = [calendar_id]
+        
+        # Get busy times from all calendars
         body = {
             "timeMin": day_start.isoformat() + 'Z',
             "timeMax": day_end.isoformat() + 'Z',
-            "items": [{"id": calendar_id}]
+            "items": [{"id": cal_id} for cal_id in calendar_ids]
         }
         
         freebusy_result = service.freebusy().query(body=body).execute()
-        busy_times = freebusy_result['calendars'][calendar_id]['busy']
+        
+        # Combine busy times from all calendars
+        all_busy_times = []
+        for cal_id in calendar_ids:
+            if cal_id in freebusy_result['calendars']:
+                busy_times = freebusy_result['calendars'][cal_id].get('busy', [])
+                all_busy_times.extend(busy_times)
+        
+        # Sort busy times by start time
+        all_busy_times.sort(key=lambda x: x['start'])
         
         # Calculate free slots
         free_slots = []
         current_time = day_start
         
-        for busy in busy_times:
+        for busy in all_busy_times:
             busy_start = datetime.fromisoformat(busy['start'].replace('Z', ''))
             busy_end = datetime.fromisoformat(busy['end'].replace('Z', ''))
             
