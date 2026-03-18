@@ -117,11 +117,11 @@ AGENT_TOOLS = [
                 "properties": {
                     "start_date": {
                         "type": "string",
-                        "description": "Start date in ISO format (e.g., '2026-03-19')"
+                        "description": "Start date in ISO format (e.g., '2026-03-19'). For single-day queries, use the specific day."
                     },
                     "end_date": {
                         "type": "string",
-                        "description": "Optional end date in ISO format. If not provided, defaults to 7 days from start_date"
+                        "description": "Optional end date in ISO format. For single-day queries (e.g., 'Friday'), set end_date to the day AFTER start_date to include the entire day. For multi-day queries (e.g., 'this week'), set appropriately."
                     },
                     "max_results": {
                         "type": "integer",

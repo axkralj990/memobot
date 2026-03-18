@@ -130,7 +130,7 @@ def list_calendar_events(
     
     Args:
         start_date: Start date in ISO format (e.g., "2026-03-19")
-        end_date: Optional end date in ISO format (defaults to start_date + 7 days)
+        end_date: Optional end date in ISO format (defaults to start_date + 1 day)
         max_results: Maximum number of events to return
         calendar_id: Calendar ID (default: "primary")
     
@@ -145,9 +145,11 @@ def list_calendar_events(
         if end_date:
             end_dt = datetime.fromisoformat(end_date)
         else:
-            end_dt = start_dt + timedelta(days=7)
+            # Default: add 1 day to include full day for single-day queries
+            # For multi-day queries, agent should specify end_date explicitly
+            end_dt = start_dt + timedelta(days=1)
         
-        # Convert to RFC3339 format
+        # Convert to RFC3339 format with UTC timezone
         time_min = start_dt.isoformat() + 'Z'
         time_max = end_dt.isoformat() + 'Z'
         
