@@ -12,3 +12,9 @@ wheels/
 # Environment variables
 .env
 .env.*
+!.env.example
+
+# Google Calendar credentials
+credentials.json
+token.pickle
+

@@ -34,10 +34,12 @@ See [docs/AGENTIC_PROGRAMMING.md](./docs/AGENTIC_PROGRAMMING.md) to learn how it
 - 📊 **Notion Database**: Automatically creates and organizes entries in your Notion database
 - 📅 **Smart Date Handling**: Understands "yesterday", "today", or specific dates
 - 🌤️ **Automatic Weather**: Fetches weather data for your location and adds it to each entry
+- 📆 **Google Calendar**: Book appointments, check schedule, find free slots (see [docs/CALENDAR_INTEGRATION.md](./docs/CALENDAR_INTEGRATION.md))
 - 💪 **Health Tracking**: Sleep, anxiety, productivity, supplements, exercise, and more
 
-## What You Can Track
+## What You Can Track & Manage
 
+### Daily Logging
 - Productivity levels
 - Anxiety status (1-5 scale)
 - Physical status
@@ -53,6 +55,16 @@ See [docs/AGENTIC_PROGRAMMING.md](./docs/AGENTIC_PROGRAMMING.md) to learn how it
 - Substances
 - **What you learned** - The agent extracts learning-related content (e.g., "I learned about X")
 - **General notes** - Summary of your entire day including workouts, activities, and anything that doesn't fit into specific fields
+
+### Calendar Management 📆
+
+- Book appointments and events
+- Check your schedule
+- Find free time slots
+- Cancel events
+- Natural language: "Book dentist tomorrow at 2pm", "What's on my calendar?"
+
+📖 **See [docs/CALENDAR_INTEGRATION.md](./docs/CALENDAR_INTEGRATION.md) for calendar setup**
 
 ### 🌤️ Automatic Weather Integration
 

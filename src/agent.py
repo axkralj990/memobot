@@ -2,8 +2,8 @@
 Agentic Daily Log Assistant
 
 This module implements an AI agent that can:
-1. Determine user intent (create entry, read entry, query data)
-2. Use tools to interact with Notion
+1. Determine user intent (create entry, read entry, query data, manage calendar)
+2. Use tools to interact with Notion and Google Calendar
 3. Provide intelligent, contextual responses
 """
 
@@ -13,6 +13,12 @@ from openai import OpenAI
 
 from src.models import DailyEntryInput
 from src.tools import create_notion_entry, query_daily_entries
+from src.tools.calendar_tools import (
+    create_calendar_event,
+    list_calendar_events,
+    find_free_slots,
+    delete_calendar_event
+)
 from src.agent_tools import AGENT_TOOLS
 from src.agent_prompt import get_system_prompt
 
@@ -105,6 +111,14 @@ class DailyLogAgent:
                     result = self._create_daily_entry(function_args["entry_data"])
                 elif function_name == "query_daily_entries":
                     result = self._query_daily_entries(**function_args)
+                elif function_name == "create_calendar_event":
+                    result = create_calendar_event(**function_args)
+                elif function_name == "list_calendar_events":
+                    result = list_calendar_events(**function_args)
+                elif function_name == "find_free_slots":
+                    result = find_free_slots(**function_args)
+                elif function_name == "delete_calendar_event":
+                    result = delete_calendar_event(**function_args)
                 else:
                     result = {"error": "Unknown function"}
                 
