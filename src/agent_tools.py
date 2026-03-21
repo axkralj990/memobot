@@ -26,12 +26,8 @@ AGENT_TOOLS = [
                             "fasting": {"type": "number", "description": "Fasting hours. Default 0 if not mentioned."},
                             "cold_min": {"type": "number", "description": "Cold exposure in minutes. Default 0 if not mentioned. Set to 1 if mentioned without specific time."},
                             "supplements": {
-                                "type": "array",
-                                "items": {
-                                    "type": "string",
-                                    "enum": ["proteins", "creatine", "collagen", "omega3", "vit+min", "bcaa", "zinc", "Mg+Theanine", "ashwagandha"]
-                                },
-                                "description": "List of supplements taken. Use 'vit+min' for vitamins"
+                                "type": "string",
+                                "description": "Comma-separated list of supplements taken (e.g., 'proteins, creatine, omega3'). Use 'vit+min' for vitamins."
                             },
                             "learned": {
                                 "type": "string",

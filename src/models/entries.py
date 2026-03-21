@@ -7,7 +7,6 @@ from .enums import (
     Productivity,
     AnxietyStatus,
     PhysicalStatus,
-    Supplement,
 )
 
 
@@ -17,7 +16,7 @@ class DailyEntryInput(BaseModel):
     productivity: Productivity | None = None
     anxiety_status: AnxietyStatus | None = None
     physical_status: PhysicalStatus | None = None
-    supplements: list[Supplement] = []
+    supplements: str | None = None
     
     sleep_hrs: float | None = None
     weight_kg: float | None = None
@@ -47,7 +46,7 @@ class DailyEntry(BaseModel):
     productivity: Productivity | None = None
     anxiety_status: AnxietyStatus | None = None
     physical_status: PhysicalStatus | None = None
-    supplements: list[Supplement] = []
+    supplements: str | None = None
     
     sleep_hrs: float | None = None
     weight_kg: float | None = None
@@ -91,7 +90,7 @@ class DailyEntry(BaseModel):
             productivity=props.get("Productivity", {}).get("select", {}).get("name") if props.get("Productivity", {}).get("select") else None,
             anxiety_status=props.get("Anxiety Status", {}).get("select", {}).get("name") if props.get("Anxiety Status", {}).get("select") else None,
             physical_status=props.get("Physical Status", {}).get("select", {}).get("name") if props.get("Physical Status", {}).get("select") else None,
-            supplements=[s["name"] for s in props.get("Supplements", {}).get("multi_select", [])],
+            supplements=get_rich_text(props.get("Supplements", {})),
             
             sleep_hrs=props.get("Sleep (hrs)", {}).get("number"),
             weight_kg=props.get("Weight (kg)", {}).get("number"),

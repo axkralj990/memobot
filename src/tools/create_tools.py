@@ -95,12 +95,6 @@ def create_notion_entry(
     if entry.physical_status:
         properties["Physical Status"] = {"select": {"name": entry.physical_status.value}}
     
-    # Add multi-select fields
-    if entry.supplements:
-        properties["Supplements"] = {
-            "multi_select": [{"name": s.value} for s in entry.supplements]
-        }
-    
     # Add number fields
     if entry.sleep_hrs is not None:
         properties["Sleep (hrs)"] = {"number": entry.sleep_hrs}
@@ -121,6 +115,11 @@ def create_notion_entry(
         properties["Points"] = {"number": entry.points}
     
     # Add rich text fields
+    if entry.supplements:
+        properties["Supplements"] = {
+            "rich_text": [{"text": {"content": entry.supplements}}]
+        }
+    
     if entry.learned:
         properties["Learned"] = {
             "rich_text": [{"text": {"content": entry.learned}}]
