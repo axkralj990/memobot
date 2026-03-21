@@ -25,8 +25,6 @@ AGENT_TOOLS = [
                             "alcohol_unt": {"type": "number", "description": "Alcohol units. Default 0 if not mentioned."},
                             "fasting": {"type": "number", "description": "Fasting hours. Default 0 if not mentioned."},
                             "cold_min": {"type": "number", "description": "Cold exposure in minutes. Default 0 if not mentioned. Set to 1 if mentioned without specific time."},
-                            "fish": {"type": "boolean"},
-                            "meat": {"type": "boolean"},
                             "supplements": {
                                 "type": "array",
                                 "items": {

@@ -120,10 +120,6 @@ def create_notion_entry(
     if entry.points is not None:
         properties["Points"] = {"number": entry.points}
     
-    # Add checkbox fields
-    properties["Fish"] = {"checkbox": entry.fish}
-    properties["Meat"] = {"checkbox": entry.meat}
-    
     # Add rich text fields
     if entry.learned:
         properties["Learned"] = {

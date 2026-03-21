@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  memobot:
+    image: axkralj990/memobot:latest
+    container_name: memobot
+    restart: unless-stopped
+    
+    environment:
+      NOTION_API_KEY: "your_notion_token_here"
+      NOTION_DATABASE_ID: "your_database_id_here"
+      OPENAI_API_KEY: "your_openai_api_key_here"
+      DISCORD_BOT_TOKEN: "your_discord_token_here"
+      DISCORD_CHANNEL_ID: "your_channel_id_here"
+      CALENDAR_IDS: "primary"
+      TIMEZONE: "Europe/Zagreb"
+    
+    volumes:
+      # Mount Google Calendar credentials (adjust paths for your system)
+      - ./credentials.json:/app/credentials.json:ro
+      - ./token.pickle:/app/token.pickle:rw
+    

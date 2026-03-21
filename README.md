@@ -36,6 +36,7 @@ See [docs/AGENTIC_PROGRAMMING.md](./docs/AGENTIC_PROGRAMMING.md) to learn how it
 - 🌤️ **Automatic Weather**: Fetches weather data for your location and adds it to each entry
 - 📆 **Google Calendar**: Book appointments, check schedule, find free slots (see [docs/CALENDAR_INTEGRATION.md](./docs/CALENDAR_INTEGRATION.md))
 - 💪 **Health Tracking**: Sleep, anxiety, productivity, supplements, exercise, and more
+- 🐳 **Docker Support**: Deploy easily to Synology NAS or any Docker host (see [docs/DOCKER_DEPLOYMENT.md](./docs/DOCKER_DEPLOYMENT.md))
 
 ## What You Can Track & Manage
 

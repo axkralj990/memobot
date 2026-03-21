@@ -28,9 +28,6 @@ class DailyEntryInput(BaseModel):
     cold_min: float = 0  # Default 0 if not mentioned
     points: float | None = None
     
-    fish: bool = False
-    meat: bool = False
-    
     learned: str | None = None
     general_notes: str | None = None
     substances: str | None = None
@@ -60,9 +57,6 @@ class DailyEntry(BaseModel):
     fasting: float | None = None
     cold_min: float | None = None
     points: float | None = None
-    
-    fish: bool = False
-    meat: bool = False
     
     learned: str | None = None
     general_notes: str | None = None
@@ -107,9 +101,6 @@ class DailyEntry(BaseModel):
             fasting=props.get("Fasting", {}).get("number"),
             cold_min=props.get("Cold (min)", {}).get("number"),
             points=props.get("Points", {}).get("number"),
-            
-            fish=props.get("Fish", {}).get("checkbox", False),
-            meat=props.get("Meat", {}).get("checkbox", False),
             
             learned=get_rich_text(props.get("Learned", {})),
             general_notes=get_rich_text(props.get("General Notes", {})),
