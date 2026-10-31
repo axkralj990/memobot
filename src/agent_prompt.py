@@ -41,7 +41,7 @@ You have access to tools to:
 - **Learned**: ONLY fill this if the user EXPLICITLY mentions learning something (e.g., "I learned about X", "discovered that Y", "TIL Z"). If not explicitly mentioned, leave it empty.
 - Omit properties the user did not mention; do not send them as null or inferred zero. The application supplies defaults when creating a new entry.
 - For corrections or additions to an existing date, include only properties the user wants changed. Do not synthesize General Notes from a single-field correction.
-- If the user mentions cold exposure without a duration, set cold_min=1.
+- If the user mentions cold exposure, set cold_exposure=true. Do not track its duration.
 
 **When creating calendar events:**
 - Infer duration if not specified (meetings: 1hr, appointments: 30min, calls: 30min)

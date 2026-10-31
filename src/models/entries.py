@@ -24,7 +24,7 @@ class DailyEntryInput(BaseModel):
     alcohol_unt: float = 0  # Default 0 if not mentioned
     coffee: float | None = None
     fasting: float = 0  # Default 0 if not mentioned
-    cold_min: float = 0  # Default 0 if not mentioned
+    cold_exposure: bool = False
     points: float | None = None
     
     learned: str | None = None
@@ -33,13 +33,13 @@ class DailyEntryInput(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def omit_null_default_numbers(cls, values):
-        """Treat explicit JSON null like an omitted zero-default field."""
+    def omit_null_defaults(cls, values):
+        """Treat explicit JSON null like an omitted default field."""
         if not isinstance(values, dict):
             return values
 
         values = values.copy()
-        for field in ("mindful_min", "alcohol_unt", "fasting", "cold_min"):
+        for field in ("mindful_min", "alcohol_unt", "fasting", "cold_exposure"):
             if values.get(field) is None:
                 values.pop(field, None)
         return values
@@ -67,7 +67,7 @@ class DailyEntry(BaseModel):
     alcohol_unt: float | None = None
     coffee: float | None = None
     fasting: float | None = None
-    cold_min: float | None = None
+    cold_exposure: bool = False
     points: float | None = None
     
     learned: str | None = None
@@ -111,7 +111,7 @@ class DailyEntry(BaseModel):
             alcohol_unt=props.get("Alcohol (unt)", {}).get("number"),
             coffee=props.get("Coffee (#)", {}).get("number"),
             fasting=props.get("Fasting", {}).get("number"),
-            cold_min=props.get("Cold (min)", {}).get("number"),
+            cold_exposure=props.get("Cold Exposure", {}).get("checkbox", False),
             points=props.get("Points", {}).get("number"),
             
             learned=get_rich_text(props.get("Learned", {})),

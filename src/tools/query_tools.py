@@ -76,6 +76,7 @@ def query_daily_entries(
             "weight_kg": entry.weight_kg,
             "mindful_min": entry.mindful_min,
             "alcohol_unt": entry.alcohol_unt,
+            "cold_exposure": entry.cold_exposure,
             "supplements": [s.value for s in entry.supplements],
             "fish": entry.fish,
             "meat": entry.meat,

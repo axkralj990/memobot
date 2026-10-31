@@ -24,7 +24,7 @@ AGENT_TOOLS = [
                             "mindful_min": {"type": "number", "description": "Mindfulness/meditation minutes. Omit if not mentioned."},
                             "alcohol_unt": {"type": "number", "description": "Alcohol units. Omit if not mentioned."},
                             "fasting": {"type": "number", "description": "Fasting hours. Omit if not mentioned."},
-                            "cold_min": {"type": "number", "description": "Cold exposure in minutes. Omit if not mentioned; set to 1 if mentioned without specific time."},
+                            "cold_exposure": {"type": "boolean", "description": "Whether the user had cold exposure, such as a cold shower or ice bath. Omit if not mentioned."},
                             "supplements": {
                                 "type": "string",
                                 "description": "Comma-separated list of supplements taken (e.g., 'proteins, creatine, omega3'). Use 'vit+min' for vitamins."

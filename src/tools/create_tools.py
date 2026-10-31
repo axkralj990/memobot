@@ -62,13 +62,15 @@ def _update_notion_entry(
         "alcohol_unt": "Alcohol (unt)",
         "coffee": "Coffee (#)",
         "fasting": "Fasting",
-        "cold_min": "Cold (min)",
         "points": "Points",
     }
     for field, notion_name in number_fields.items():
         value = getattr(entry, field)
         if field in supplied and value is not None:
             properties[notion_name] = {"number": value}
+
+    if "cold_exposure" in supplied:
+        properties["Cold Exposure"] = {"checkbox": entry.cold_exposure}
 
     text_fields = {
         "supplements": "Supplements",
@@ -220,7 +222,7 @@ def create_notion_entry(
     properties["Mindful (min)"] = {"number": entry.mindful_min}
     properties["Alcohol (unt)"] = {"number": entry.alcohol_unt}
     properties["Fasting"] = {"number": entry.fasting}
-    properties["Cold (min)"] = {"number": entry.cold_min}
+    properties["Cold Exposure"] = {"checkbox": entry.cold_exposure}
     
     if entry.coffee is not None:
         properties["Coffee (#)"] = {"number": entry.coffee}

@@ -84,6 +84,23 @@ def test_existing_general_notes_are_appended(mock_post, mock_patch):
 
 @patch("src.tools.create_tools.requests.patch")
 @patch("src.tools.create_tools.requests.post")
+def test_existing_cold_exposure_is_updated_as_checkbox(mock_post, mock_patch):
+    existing_page = {"id": "page-123", "url": "https://notion.so/page-123"}
+    mock_post.return_value = notion_response({"results": [existing_page]})
+    mock_patch.return_value = notion_response(existing_page)
+    entry = DailyEntryInput(
+        entry_date=date(2026, 10, 31),
+        cold_exposure=True,
+    )
+
+    create_notion_entry(entry, "database-id", "token")
+
+    update_payload = mock_patch.call_args.kwargs["json"]
+    assert update_payload["properties"]["Cold Exposure"] == {"checkbox": True}
+
+
+@patch("src.tools.create_tools.requests.patch")
+@patch("src.tools.create_tools.requests.post")
 def test_duplicate_dates_are_not_updated(mock_post, mock_patch):
     mock_post.return_value = notion_response(
         {
@@ -118,4 +135,5 @@ def test_missing_date_creates_new_page(mock_post, _mock_weather, _mock_summary):
     create_payload = mock_post.call_args_list[1].kwargs["json"]
     assert create_payload["properties"]["Sleep (hrs)"] == {"number": 8.0}
     assert create_payload["properties"]["Mindful (min)"] == {"number": 0.0}
+    assert create_payload["properties"]["Cold Exposure"] == {"checkbox": False}
     assert "children" not in create_payload

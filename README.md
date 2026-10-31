@@ -51,7 +51,7 @@ See [docs/AGENTIC_PROGRAMMING.md](./docs/AGENTIC_PROGRAMMING.md) to learn how it
 - Coffee consumption
 - Alcohol units
 - Fasting hours
-- Cold exposure minutes (defaults to 1 if not specified)
+- Cold exposure (yes/no)
 - Fish/meat consumption
 - Substances
 - **What you learned** - The agent extracts learning-related content (e.g., "I learned about X")

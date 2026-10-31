@@ -45,7 +45,7 @@ Extract the following information from the user's message:
 - Alcohol units consumed
 - Coffee cups/shots
 - Fasting hours
-- Cold exposure minutes (cold shower, ice bath)
+- Whether they had cold exposure (cold shower, ice bath)
 - Whether they ate fish or meat
 - Any substances used
 - What they learned
