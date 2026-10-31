@@ -73,7 +73,6 @@ def _update_notion_entry(
     text_fields = {
         "supplements": "Supplements",
         "learned": "Learned",
-        "general_notes": "General Notes",
         "substances": "Substances",
     }
     for field, notion_name in text_fields.items():
@@ -82,6 +81,26 @@ def _update_notion_entry(
             properties[notion_name] = {
                 "rich_text": [{"text": {"content": value}}]
             }
+
+    if "general_notes" in supplied and entry.general_notes:
+        existing_items = (
+            page.get("properties", {})
+            .get("General Notes", {})
+            .get("rich_text", [])
+        )
+        existing_notes = "".join(
+            item.get("plain_text")
+            or item.get("text", {}).get("content", "")
+            for item in existing_items
+        ).strip()
+        combined_notes = (
+            f"{existing_notes}\n\n{entry.general_notes}"
+            if existing_notes
+            else entry.general_notes
+        )
+        properties["General Notes"] = {
+            "rich_text": [{"text": {"content": combined_notes}}]
+        }
 
     if not properties:
         return {**page, "_memobot_action": "updated"}

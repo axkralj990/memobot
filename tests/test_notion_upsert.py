@@ -51,6 +51,39 @@ def test_existing_date_updates_only_supplied_properties(
 
 @patch("src.tools.create_tools.requests.patch")
 @patch("src.tools.create_tools.requests.post")
+def test_existing_general_notes_are_appended(mock_post, mock_patch):
+    existing_page = {
+        "id": "page-123",
+        "url": "https://notion.so/page-123",
+        "properties": {
+            "General Notes": {
+                "rich_text": [{"plain_text": "Original description."}]
+            }
+        },
+    }
+    mock_post.return_value = notion_response({"results": [existing_page]})
+    mock_patch.return_value = notion_response(existing_page)
+    entry = DailyEntryInput(
+        entry_date=date(2026, 10, 31),
+        general_notes="Additional thought.",
+    )
+
+    create_notion_entry(entry, "database-id", "token")
+
+    update_payload = mock_patch.call_args.kwargs["json"]
+    assert update_payload["properties"]["General Notes"] == {
+        "rich_text": [
+            {
+                "text": {
+                    "content": "Original description.\n\nAdditional thought."
+                }
+            }
+        ]
+    }
+
+
+@patch("src.tools.create_tools.requests.patch")
+@patch("src.tools.create_tools.requests.post")
 def test_duplicate_dates_are_not_updated(mock_post, mock_patch):
     mock_post.return_value = notion_response(
         {
