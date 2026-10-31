@@ -1,7 +1,7 @@
 """Daily entry models for input and database representation."""
 
 from datetime import date, datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from .enums import (
     Productivity,
@@ -30,6 +30,12 @@ class DailyEntryInput(BaseModel):
     learned: str | None = None
     general_notes: str | None = None
     substances: str | None = None
+
+    @field_validator("mindful_min", "alcohol_unt", "fasting", "cold_min", mode="before")
+    @classmethod
+    def default_null_numbers_to_zero(cls, value):
+        """Treat explicit JSON null like an omitted zero-default field."""
+        return 0 if value is None else value
 
 
 class DailyEntry(BaseModel):
