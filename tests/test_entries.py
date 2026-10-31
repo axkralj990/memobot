@@ -23,6 +23,7 @@ def test_zero_default_fields_accept_explicit_null():
 
     for field in ZERO_DEFAULT_FIELDS:
         assert getattr(entry, field) == 0
+        assert field not in entry.model_fields_set
 
 
 def test_zero_default_fields_preserve_provided_values():

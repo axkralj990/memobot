@@ -33,7 +33,7 @@ class DailyLogAgent:
         self.tools = AGENT_TOOLS
     
     def _create_daily_entry(self, entry_data: dict) -> dict:
-        """Tool: Create a daily entry in Notion."""
+        """Tool: Create or update a daily entry in Notion."""
         # Convert 'date' to 'entry_date' if needed (OpenAI sends 'date')
         if "date" in entry_data and "entry_date" not in entry_data:
             entry_data["entry_date"] = entry_data.pop("date")
@@ -49,11 +49,18 @@ class DailyLogAgent:
             self.notion_token,
             location=location
         )
+        action = result.get("_memobot_action", "created")
+        message = (
+            f"Entry updated for {entry.entry_date}"
+            if action == "updated"
+            else f"Entry created for {entry.entry_date} with weather data"
+        )
         return {
             "success": True,
             "url": result["url"],
             "date": entry.entry_date.isoformat(),
-            "message": f"Entry created for {entry.entry_date} with weather data"
+            "action": action,
+            "message": message,
         }
     
     def _query_daily_entries(self, target_date: str, num_entries: int = 1) -> dict:

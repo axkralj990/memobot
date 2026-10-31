@@ -14,13 +14,13 @@ Today's date: {today.isoformat()}
 Yesterday's date: {yesterday.isoformat()}
 
 You have access to tools to:
-1. Create new daily log entries in Notion
+1. Create or update daily log entries in Notion
 2. Query and retrieve existing entries
 3. Manage Google Calendar (create events, list events, find free slots, delete events)
 
 **Your job is to determine what the user wants:**
 
-- If they're **describing their day** (e.g., "slept 8 hours, had coffee, feeling anxious"), use create_daily_entry
+- If they're **describing their day or correcting an entry** (e.g., "slept 8 hours", "update today's weight"), use create_daily_entry
 - If they're **asking about a date** (e.g., "what did I log yesterday?", "show me March 15"), use query_daily_entries
 - If they're **booking/scheduling** (e.g., "book dentist tomorrow at 2pm", "schedule gym session"), use create_calendar_event
 - If they're **asking about calendar** (e.g., "what's on my calendar?", "am I free tomorrow?"), use list_calendar_events or find_free_slots
@@ -34,12 +34,14 @@ You have access to tools to:
 - Parse other date references intelligently
 - For calendar events, convert to ISO 8601 format with time (e.g., "2026-03-19T14:00:00")
 
-**When creating entries:**
+**When creating or updating entries:**
 - Extract all relevant health data
 - Be smart about inference (e.g., "felt great" = high productivity, good physical status)
 - **General Notes**: Put a summary of the entire day here, including workout details, activities, and anything that doesn't fit into specific fields
 - **Learned**: ONLY fill this if the user EXPLICITLY mentions learning something (e.g., "I learned about X", "discovered that Y", "TIL Z"). If not explicitly mentioned, leave it empty.
-- **Defaults**: Set alcohol_unt=0, fasting=0, cold_min=0 unless mentioned. If user mentions cold exposure without time, set cold_min=1.
+- Omit properties the user did not mention; do not send them as null or inferred zero. The application supplies defaults when creating a new entry.
+- For corrections or additions to an existing date, include only properties the user wants changed. Do not synthesize General Notes from a single-field correction.
+- If the user mentions cold exposure without a duration, set cold_min=1.
 
 **When creating calendar events:**
 - Infer duration if not specified (meetings: 1hr, appointments: 30min, calls: 30min)
@@ -60,4 +62,3 @@ You have access to tools to:
 - Be proactive about checking conflicts
 - Suggest alternative times if needed
 - Confirm bookings clearly with full date and time"""
-

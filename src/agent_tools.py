@@ -5,7 +5,7 @@ AGENT_TOOLS = [
         "type": "function",
         "function": {
             "name": "create_daily_entry",
-            "description": "Create a new daily log entry in Notion with weather data. Weather defaults to Ljubljana unless user mentions another location.",
+            "description": "Create or update a daily log entry in Notion. If the date already exists, only supplied properties are updated. Weather defaults to Ljubljana for new entries.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -21,10 +21,10 @@ AGENT_TOOLS = [
                             "sleep_hrs": {"type": "number"},
                             "coffee": {"type": "number"},
                             "weight_kg": {"type": "number"},
-                            "mindful_min": {"type": "number", "description": "Mindfulness/meditation minutes. Default 0 if not mentioned."},
-                            "alcohol_unt": {"type": "number", "description": "Alcohol units. Default 0 if not mentioned."},
-                            "fasting": {"type": "number", "description": "Fasting hours. Default 0 if not mentioned."},
-                            "cold_min": {"type": "number", "description": "Cold exposure in minutes. Default 0 if not mentioned. Set to 1 if mentioned without specific time."},
+                            "mindful_min": {"type": "number", "description": "Mindfulness/meditation minutes. Omit if not mentioned."},
+                            "alcohol_unt": {"type": "number", "description": "Alcohol units. Omit if not mentioned."},
+                            "fasting": {"type": "number", "description": "Fasting hours. Omit if not mentioned."},
+                            "cold_min": {"type": "number", "description": "Cold exposure in minutes. Omit if not mentioned; set to 1 if mentioned without specific time."},
                             "supplements": {
                                 "type": "string",
                                 "description": "Comma-separated list of supplements taken (e.g., 'proteins, creatine, omega3'). Use 'vit+min' for vitamins."
@@ -177,4 +177,3 @@ AGENT_TOOLS = [
         }
     }
 ]
-

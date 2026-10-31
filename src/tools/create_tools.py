@@ -6,6 +6,96 @@ from src.models import DailyEntryInput
 from .weather_tools import get_weather_for_date, format_weather_summary
 
 
+def _notion_headers(notion_token: str) -> dict:
+    return {
+        "Authorization": f"Bearer {notion_token}",
+        "Notion-Version": "2022-06-28",
+        "Content-Type": "application/json",
+    }
+
+
+def _find_entries_by_date(
+    database_id: str,
+    notion_token: str,
+    entry_date: date,
+) -> list[dict]:
+    """Return up to two pages matching a date so duplicates can be detected."""
+    response = requests.post(
+        f"https://api.notion.com/v1/databases/{database_id}/query",
+        headers=_notion_headers(notion_token),
+        json={
+            "filter": {
+                "property": "Date",
+                "date": {"equals": entry_date.isoformat()},
+            },
+            "page_size": 2,
+        },
+        timeout=30,
+    )
+    response.raise_for_status()
+    return response.json()["results"]
+
+
+def _update_notion_entry(
+    page: dict,
+    entry: DailyEntryInput,
+    notion_token: str,
+) -> dict:
+    """Patch only explicitly supplied database properties on an existing page."""
+    supplied = entry.model_fields_set
+    properties = {}
+
+    select_fields = {
+        "productivity": "Productivity",
+        "anxiety_status": "Anxiety Status",
+        "physical_status": "Physical Status",
+    }
+    for field, notion_name in select_fields.items():
+        value = getattr(entry, field)
+        if field in supplied and value is not None:
+            properties[notion_name] = {"select": {"name": value.value}}
+
+    number_fields = {
+        "sleep_hrs": "Sleep (hrs)",
+        "weight_kg": "Weight (kg)",
+        "mindful_min": "Mindful (min)",
+        "alcohol_unt": "Alcohol (unt)",
+        "coffee": "Coffee (#)",
+        "fasting": "Fasting",
+        "cold_min": "Cold (min)",
+        "points": "Points",
+    }
+    for field, notion_name in number_fields.items():
+        value = getattr(entry, field)
+        if field in supplied and value is not None:
+            properties[notion_name] = {"number": value}
+
+    text_fields = {
+        "supplements": "Supplements",
+        "learned": "Learned",
+        "general_notes": "General Notes",
+        "substances": "Substances",
+    }
+    for field, notion_name in text_fields.items():
+        value = getattr(entry, field)
+        if field in supplied and value:
+            properties[notion_name] = {
+                "rich_text": [{"text": {"content": value}}]
+            }
+
+    if not properties:
+        return {**page, "_memobot_action": "updated"}
+
+    response = requests.patch(
+        f"https://api.notion.com/v1/pages/{page['id']}",
+        headers=_notion_headers(notion_token),
+        json={"properties": properties},
+        timeout=30,
+    )
+    response.raise_for_status()
+    return {**response.json(), "_memobot_action": "updated"}
+
+
 def determine_emoji(entry_date: date, general_notes: str | None, location: str) -> str:
     """Determine the appropriate emoji based on date, content, and location."""
     notes_lower = (general_notes or "").lower()
@@ -52,13 +142,18 @@ def create_notion_entry(
     notion_token: str,
     location: str = "ljubljana"
 ) -> dict:
-    """Create a new entry in Notion database from DailyEntryInput."""
+    """Create an entry, or patch supplied properties when its date exists."""
+    matches = _find_entries_by_date(database_id, notion_token, entry.entry_date)
+    if len(matches) > 1:
+        raise RuntimeError(
+            f"Multiple Notion entries found for {entry.entry_date}; "
+            "refusing to update an arbitrary page"
+        )
+    if matches:
+        return _update_notion_entry(matches[0], entry, notion_token)
+
     url = "https://api.notion.com/v1/pages"
-    headers = {
-        "Authorization": f"Bearer {notion_token}",
-        "Notion-Version": "2022-06-28",
-        "Content-Type": "application/json",
-    }
+    headers = _notion_headers(notion_token)
     
     # Get weather data for the entry date
     weather_data = get_weather_for_date(entry.entry_date, location)
@@ -222,9 +317,9 @@ def create_notion_entry(
     if children:
         payload["children"] = children
     
-    response = requests.post(url, headers=headers, json=payload)
+    response = requests.post(url, headers=headers, json=payload, timeout=30)
     if not response.ok:
         print(f"❌ Notion API Error: {response.status_code}")
         print(f"Response: {response.text}")
     response.raise_for_status()
-    return response.json()
+    return {**response.json(), "_memobot_action": "created"}
